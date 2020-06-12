@@ -12,3 +12,11 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
     actions: [new chrome.declarativeContent.ShowPageAction()]
   }]);
 });
+
+chrome.tabs.onUpdated.addListener(function (tabId, info) {
+  if (info.status === 'complete') {
+    chrome.tabs.executeScript(null, {
+      file: 'content_script.js'
+    });
+  }
+});
