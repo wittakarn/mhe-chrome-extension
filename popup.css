@@ -1,0 +1,19 @@
+body {
+    width: 300px;
+}
+
+.botton-wrapper {
+    text-align: center;
+}
+
+.botton-wrapper button {
+    margin: 0 20px;
+}
+
+.command-table th, .command-tabletd{ 
+    width: 50%;
+}
+
+.command-table input{ 
+    width: 90%;
+}

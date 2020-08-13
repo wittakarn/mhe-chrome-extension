@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="popup.css">
+  </head>
   <body>
-    <div>
-      Remove elements: 
-      <input id="removeElement"/>
+    <div class="botton-wrapper">
+      <button id="addCommand">add</button>
+      <button id="removeCommand">remove</button>
     </div>
-    <button id="confirm">confirm</button>
-    <script src="popup.js"></script>
+    <table class="command-table" width="100%">
+      <th>selector</th>
+      <th>styling</th>
+      <tbody id="command-list"></tbody>
+    </table>
+    <div class="botton-wrapper">
+      <button id="confirm">confirm</button>
+    </div>
   </body>
+  <script src="popup.js"></script>
 </html>
