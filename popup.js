@@ -1,21 +1,38 @@
 const commandList = document.getElementById('command-list');
 const addCommandButton = document.getElementById('addCommand');
 const removeCommandButton = document.getElementById('removeCommand');
-const confirmButton = document.getElementById('confirm');
+const saveButton = document.getElementById('save');
+const startButton = document.getElementById('start');
+const stopButton = document.getElementById('stop');
 
 window.onload = function () {
-    chrome.storage.sync.get(['extensionCommands'], function (items) {
-        if (items['extensionCommands']) {
-            const commands = JSON.parse(items['extensionCommands']);
+    chrome.storage.sync.get(['extensionMheStorage'], function (items) {
+        if (items['extensionMheStorage']) {
+            const storage = items['extensionMheStorage'];
 
-            for(command of commands) {
-                commandList.appendChild(generateInput(command.selector, command.styling));
+            if (storage.commands) {
+                for (command of storage.commands) {
+                    commandList.appendChild(generateInput(command.selector, command.styling));
+                }
+
+                if (storage.commands.length > 0) {
+                    startButton.style.display = storage.state.processing ? 'none' : 'inline';
+                    stopButton.style.display = storage.state.processing ? 'inline' : 'none';
+                }
             }
         }
     });
 }
 
-confirmButton.onclick = function () {
+addCommandButton.onclick = function () {
+    commandList.appendChild(generateInput('', ''));
+};
+
+removeCommandButton.onclick = function () {
+    commandList.removeChild(commandList.lastChild);
+};
+
+saveButton.onclick = function () {
     const selectors = document.getElementsByName('selector');
     const styles = document.getElementsByName('styling');
 
@@ -27,24 +44,42 @@ confirmButton.onclick = function () {
             }
         )
     );
-    updateSelectorStyle(JSON.stringify(commandList));
+    updateExtensionStorage({ commands: commandList, state: { processing: true } });
 
     chrome.tabs.executeScript(null, {
         file: 'content_script.js'
     });
 };
 
-addCommandButton.onclick = function () {
-    commandList.appendChild(generateInput('', ''));
+startButton.onclick = () => {
+    updateExtensionStorage({ state: { processing: true } });
+
+    chrome.tabs.executeScript(null, {
+        file: 'content_script.js'
+    });
+
+    startButton.style.display = 'none';
+    stopButton.style.display = 'inline';
 };
 
-removeCommandButton.onclick = function () {
-    commandList.removeChild(commandList.lastChild);
+stopButton.onclick = () => {
+    updateExtensionStorage({ state: { processing: false } });
+
+    startButton.style.display = 'inline';
+    stopButton.style.display = 'none';
 };
 
-function updateSelectorStyle(value) {
-    chrome.storage.sync.set({ 'extensionCommands': value }, function () {
-        //  A data saved callback omg so fancy
+function updateExtensionStorage(value) {
+    chrome.storage.sync.get(['extensionMheStorage'], function (items) {
+        chrome.storage.sync.set(
+            {
+                'extensionMheStorage': {
+                    ...(items['extensionMheStorage'] ? items['extensionMheStorage'] : {}),
+                    ...value
+                }
+            },
+            () => { }
+        );
     });
 }
 
